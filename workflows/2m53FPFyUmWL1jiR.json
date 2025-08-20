@@ -3,7 +3,7 @@
   "connections": {},
   "createdAt": "2025-07-25T21:03:58.344Z",
   "id": "2m53FPFyUmWL1jiR",
-  "isArchived": false,
+  "isArchived": true,
   "meta": null,
   "name": "image generation insta reels",
   "nodes": [],
@@ -23,6 +23,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2025-07-25T23:48:20.000Z",
-  "versionId": "736cad91-224a-48bc-a76d-d06a858c42d3"
+  "updatedAt": "2025-08-20T22:39:56.000Z",
+  "versionId": "5419a831-0531-4231-b98d-d356a441256a"
 }
