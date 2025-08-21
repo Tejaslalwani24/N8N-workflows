@@ -1,0 +1,270 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "image generation",
+        "formDescription": "tell me the following things for your video generation",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "email ",
+              "fieldType": "email",
+              "placeholder": "writeur@email.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "image of the product",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": "toothpaste",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "product description",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "product title",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "efdf1f42-a9c1-4739-a3f4-8284a8e984a2",
+      "name": "On form submission",
+      "webhookId": "63b7890f-d06d-4d9a-a9e4-8b81a3159890"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "image_of_the_product",
+        "name": "={{ $json['product title'] }} (Original)",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1CNelmtI3FUC8Ji6eaot3OV5BlrffWd3m",
+          "mode": "list",
+          "cachedResultName": "Image generation",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1CNelmtI3FUC8Ji6eaot3OV5BlrffWd3m"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "bb467406-b624-452f-95a0-ca9912b15f45",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I9wMYkivXBCEfec5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Product: {{ $('On form submission').item.json['product title'] }}\nDescription: {{ $('On form submission').item.json['product description'] }}",
+        "options": {
+          "systemMessage": "=Generate a professional, high-resolution product image prompt for the given product with a clean, sleek, and modern aesthetic. The product should be centered, well-lit, and displayed on a smooth, minimal surface with a subtle reflection. Use a punchy color palette with vibrant contrasts to make the product stand out, while keeping the background simple—such as a gradient or solid tone that complements the product's color. Lighting should be soft and diffused, creating dynamic highlights and gentle shadows to emphasize shape and texture. The image should look like it's from a premium studio photoshoot—minimalist, bold, and visually striking. No clutter, no distractions—just pure focus on the product"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -16
+      ],
+      "id": "dedfb1bc-60ab-4be0-afe3-06d5ef38da39",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        432,
+        208
+      ],
+      "id": "5a2cc395-732e-4861-9930-0b6d71b1f7ea",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hfApid9TPAzvn0EY",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Upload file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        768,
+        -16
+      ],
+      "id": "f7d2693e-5833-4cdd-a01c-9d091d8a3a38",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I9wMYkivXBCEfec5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 24991381336eab93e57eba263706a87e0abfe5f3f43312fb300bb6d6b1da283e"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "black-forest-labs/FLUX.1-schnell-Free"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        0
+      ],
+      "id": "c10f7871-f92b-4fed-be4f-20308f34a913",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data[0].url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "c9791b38-4a38-4837-8201-cf4b9abd5325",
+      "name": "HTTP Request1"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fb99dcfb7364cdfce9c87e521b35a79151df4823b149ecb1a54e0eb51e7be69"
+  }
+}
