@@ -1,0 +1,449 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Give me the biggest AI and related news in last 24 hours",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Overview\nYou are an AI Agent specialized in creating professional, educational, and engaging Instagram Reels posts based on the latest AI-related news.\n\nObjectives:\nAlways begin by conducting a real-time search using the Firecrawl tool to scrape the biggest AI or AI-related news story in the last 24 hours.\n\nBased on the collected news, create an attractive topic and description for each of them that summarizes the most impactful trends or updates.\n\nThe final output should be written to appeal to professionals in the AI field and individuals who want to learn more about AI, while being educational, insightful, and engaging.\n\nTools\n✅ Mandatory: Use the Firecrawl tool every time to gather the biggest AI or AI-related news from the past 24 hours.\n\nContent Requirements:\nBased on your research, generate a well-structured Instagram Reels post that:\n\nStarts with an engaging hook relevant to the AI trend or news.\n\nUses a professional yet appealing tone.\n\nIs clear, easy to read, and concise.\n\nIs educational and insightful.\n\nLight on emojis (use only when highly relevant and minimal).\n\nIncludes proper source attribution (e.g., “according to [source]”).\n\nContains relevant hashtags to boost visibility.\n\nEnds with a call to action (e.g., “What are your thoughts on this update?”).\n\nOutput Instructions:\nGive an appealing topic, short appealing description (5-6 lines) and longer description (1-2 paragraphs) for each topic\n\nOutput example:\n\"Topic\": an appealing topic.\n\"Short Description\": a short description with key takeaways (5-6 lines)\n\"Description\": a longer description which describes the whole story behind the topic (1-2 paragraphs)\n#usa,#america (use all hashtags in the end of the post)\n\nInclude explanations, notes, or any other text beyond the post for the description of Instagram reels\n\nExample Workflow:\nReceive a request to create a post.\n\nUse Firecrawl to scrape the biggest AI/AI-related news story from the past 24 hours.\n\nFrom these, come up with an attractive topic and a concise description that highlights the key takeaway. Also generate additional information for the description of Instagram reels\n\nDraft a final Instagram Reels post with source citations, hashtags, and a clear CTA. \nThe hashtags are important because they will help us get more reach, so put many hashtags"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        784
+      ],
+      "id": "7cac65ea-9c33-405f-9f32-dee95d26c3e7",
+      "name": "AI Agent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        1024
+      ],
+      "id": "b5c4ea4d-5ed1-45a4-87b8-f135a99d8bf8",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eSh3Pj4GS27tPEOB",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 24991381336eab93e57eba263706a87e0abfe5f3f43312fb300bb6d6b1da283e"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "black-forest-labs/FLUX.1-schnell-Free"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $('AI Agent2').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        352,
+        784
+      ],
+      "id": "34606a4f-3962-4df6-9dc8-c8c46bce00f4",
+      "name": "Togather Ai image generation"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data[0].url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        784
+      ],
+      "id": "838d690a-c4ef-4997-a4e4-fd72c819a334",
+      "name": "data to binary"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        784
+      ],
+      "id": "3137545a-8ba1-47ce-90ad-d2a9aff48f60",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "=\n⚠️ **MANDATORY:** Always perform a **Tavily search FIRST** to gather the **latest, factual details**. **Never guess or use outdated info.\n\n✅ **Step 1 – Research with Tavily\n\n* Search the given topic using Tavily.\n* Extract **3–4 key facts** that are **recent, relevant, and newsworthy.**\n* Facts must be short, objective, and easy to verify.\n* Use these facts to create a useful image prompt like getting the name of ceo and mentioning in image prompt that this ceo should look like this in image\n\nfor example: Sam Altman wearing sunglasses with his arms crossed on a sunny day in a beach\n\n\n### ✅ **Step 2 – Create the Image Prompt**\n\nGenerate a **cinematic, Instagram-ready image prompt** that includes:\n✅ A **realistic background** related to the news (CEO, robots, futuristic city, glowing screens, etc.)\n✅ A **cinematic, futuristic style** – dramatic lighting, sharp focus, vivid colors.\n✅ Feels like a **high-quality tech news poster** (similar to \"Evolving AI\").\nRemember to use facts from Tavily to use in this prompt generation\n\n---\n\n### 🔒 **Rules:**\n\n🚫 **Never guess facts.** Always use Tavily search first.\n🚫 **Never skip any step.**\n🚫 **Do not add extra commentary in the final output.**\n\n---\n\n### 📌 **FINAL OUTPUT FORMAT**\n\nReturn **ONLY** the image generation prompt in this structure:\n\nA cinematic [scene description: CEO/robot/futuristic screens, etc.], dramatic lighting, futuristic style,  Instagram tech news poster style, high contrast, sharp focus, 8K quality.\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        784
+      ],
+      "id": "ab27dbaf-7ccc-4b98-84b1-519829235751",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1008
+      ],
+      "id": "3332bc55-069a-46f5-9afe-b18c12e35481",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eSh3Pj4GS27tPEOB",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.theverge.com/ai-artificial-intelligence",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer fc-aefec7f2e6e44e4497860fa9ef315f92"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"url\": \"https://docs.firecrawl.dev\",\n  \"formats\": [\n    \"markdown\",\n    \"html\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -736,
+        1008
+      ],
+      "id": "fa61491a-4fb8-481e-affb-6710d3e0792f",
+      "name": "Firecrawl"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Topic\": \"California\",\n\t\"short description\": \"short description\",\n    \"Description\": \"description\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -624,
+        1008
+      ],
+      "id": "de58d25c-e310-45ad-bb08-4bed271a26f9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        784
+      ],
+      "id": "39045822-72a4-4a15-8f6d-84e20951f83a",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -368,
+        784
+      ],
+      "id": "f5aec3f2-ceb7-4f8b-afc7-25559cc5af63",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"{{ $json.output }}\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 1,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": false\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        32,
+        1024
+      ],
+      "id": "1e1359f7-718c-4ced-b81f-224acb5c14ea",
+      "name": "Tavily Search"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('Loop Over Items').first().json.output || \"\";  // Replace $json.text with your input key\nconst maxLen = 80;\n\nfunction wrapText(str, maxLen) {\n  const words = str.split(\" \");\n  let lines = [];\n  let line = \"\";\n\n  for (const word of words) {\n    if ((line + \" \" + word).trim().length <= maxLen) {\n      line += (line ? \" \" : \"\") + word;\n    } else {\n      lines.push(line);\n      line = word;\n    }\n  }\n  if (line) lines.push(line);\n\n  return lines.join(\"\\n\");\n}\n\nreturn [{ wrapped: wrapText(text, maxLen) }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        784
+      ],
+      "id": "115b58e6-7112-4ceb-a05d-12af5ccba1a2",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "name": "1",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1ER0ALEKBYSn36qeyrq320P96Ve0ezmdV",
+          "mode": "list",
+          "cachedResultName": "evolving ai",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1ER0ALEKBYSn36qeyrq320P96Ve0ezmdV"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        720,
+        784
+      ],
+      "id": "b0487305-2e5a-4b0f-a8a9-0a341873ed5b",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I9wMYkivXBCEfec5",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Togather Ai image generation": {
+      "main": [
+        [
+          {
+            "node": "data to binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data to binary": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firecrawl": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily Search": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Togather Ai image generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fb99dcfb7364cdfce9c87e521b35a79151df4823b149ecb1a54e0eb51e7be69"
+  }
+}
