@@ -1,0 +1,396 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write image generation prompt for youtube video thumbnail topic: {{ $json.output }} ",
+        "options": {
+          "systemMessage": "=📘 Reference PDF:\nhttps://raw.githubusercontent.com/rbrown101010/rileypublic/main/dddd.pdf\n\n🧠 Purpose\nThis AI Agent is designed to create high-quality image generation prompts for YouTube thumbnails. These prompts must result in images that resemble the style and effectiveness of the thumbnails shown in the reference PDF.\n\n🛠️ Tools Required\nTavily Search Tool\n▸ You must use this tool to gather context and ideas for every topic.\n▸ It is mandatory for each run of this agent.\n\n🔄 Workflow\nSearch\nUse the Tavily search tool to collect relevant and up-to-date information about the given YouTube video topic.\n\nAnalyze\nReview the reference PDF to understand the visual style, composition, tone, and elements used in the example thumbnails.\n\nGenerate Prompt\nBased on the topic and Tavily search results, write an image generation prompt that:\n\nIs visually consistent with the examples in the PDF\n\nIs relevant to the topic\n\nIncludes compelling elements (e.g., expressions, objects, bold colors, text styling, etc.)\n\n🧾 Output Format\nYour only output must be the image generation prompt — nothing else.\n\nExample Prompt:\n1. A vibrant, high-contrast YouTube thumbnail featuring a shocked or surprised programmer looking intently at a split screen. On one side, a sleek, futuristic interface representing \"Claude Code\" glows with bright, intelligent blue and green lines of code, emanating a powerful and advanced aura. On the other side, a cracked, desaturated, and slightly smoking interface representing \"Cursor\" is shown, implying its obsolescence or defeat. Bold, impactful text overlays: \"CLAUDE CODE IS HERE!\" in a modern, assertive font across the top, and \"Is Cursor COOKED?\" in a slightly distressed, urgent font below, with a prominent question mark. The background is a dark, tech-inspired environment with subtle circuit board patterns or digital data streams. Dramatic lighting highlights the programmer's face and the contrasting states of the two interfaces. The overall composition is dynamic and attention-grabbing, using strong visual metaphors to convey the rivalry and the impactful arrival of Claude.\n\n2. A dynamic, high-contrast YouTube thumbnail featuring a central figure, a person (could be a tech enthusiast, programmer, or writer) with a look of astonishment and excitement, facing a vibrant, holographic projection of \"GPT-5\". The GPT-5 projection should be represented as a complex, glowing neural network or an ethereal, intelligent orb, radiating electric blue and purple light, symbolizing advanced AI. Flowing from the GPT-5 projection are streams of elegant, readable code on one side, intertwining with sophisticated literary text and formulas on the other, visually representing its mastery in coding, writing, and knowledge. The background is a futuristic, dimly lit digital landscape with subtle circuit board patterns and glowing data streams, highlighting the AI's immense processing power and intelligence. Bold, impactful text overlays: \"CHAT GPT 5 IS HERE!\" in a modern, assertive font across the top, and \"PHD Level Expert Unleashed\" or \"Your New Genius Partner\" in a slightly smaller, yet prominent font below, with subtle glowing effects. The overall composition is designed to convey awe, breakthrough, and limitless intellectual potential.\n\n3. A dynamic, high-contrast YouTube thumbnail featuring a central figure, a person (could be a tech enthusiast, programmer, or writer) with a look of astonishment and excitement, facing a vibrant, holographic projection of \"GPT-5\". The GPT-5 projection should be represented as a complex, glowing neural network or an ethereal, intelligent orb, radiating electric blue and purple light, symbolizing advanced AI. Flowing from the GPT-5 projection are streams of elegant, readable code on one side, intertwining with sophisticated literary text and formulas on the other, visually representing its mastery in coding, writing, and knowledge. The background is a futuristic, dimly lit digital landscape with subtle circuit board patterns and glowing data streams, highlighting the AI's immense processing power and intelligence. Bold, impactful text overlays: \"CHAT GPT 5 IS HERE!\" in a modern, assertive font across the top, and \"PHD Level Expert Unleashed\" or \"Your New Genius Partner\" in a slightly smaller, yet prominent font below, with subtle glowing effects. The overall composition is designed to convey awe, breakthrough, and limitless intellectual potential.\n\n4. A vibrant, high-contrast YouTube thumbnail featuring a dynamic central figure, a person (could be a tech enthusiast, programmer, or writer) with a look of astonishment and excitement, facing a brilliant, evolving holographic projection of \"GPT-5\". The GPT-5 projection should be represented as a complex, glowing neural network or an ethereal, intelligent orb, radiating electric blue and purple light, symbolizing advanced AI. Flowing from the GPT-5 projection are streams of elegant, readable code on one side, intertwining with sophisticated literary text and complex scientific formulas on the other, visually representing its mastery in coding, writing, and knowledge at a PhD level. The background is a futuristic, dimly lit digital landscape with subtle circuit board patterns and glowing data streams, highlighting the AI's immense processing power and intelligence. Bold, impactful text overlays: \"CHAT GPT 5 IS HERE!\" in a modern, assertive font across the top, and \"PHD Level Expert Unleashed\" or \"Your New Genius Partner\" in a slightly smaller, yet prominent font below, with subtle glowing effects. The overall composition is designed to convey awe, breakthrough, and limitless intellectual potential."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1072,
+        416
+      ],
+      "id": "83b86430-ab5e-4ec2-bf43-91ca7f4b490f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        624
+      ],
+      "id": "fd05e4c9-0f12-43e4-b653-a7a69ac54d43",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eSh3Pj4GS27tPEOB",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash-preview-image-generation",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash-preview-image-generation"
+        },
+        "prompt": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        416
+      ],
+      "id": "c65db0d0-ca4d-49f8-bd16-5c1c458ba2d7",
+      "name": "Generate an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eSh3Pj4GS27tPEOB",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Topic of youtube video",
+        "formDescription": "Give the topic of youtube video",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Topic",
+              "placeholder": "Topic"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        400
+      ],
+      "id": "938f9d0c-af56-4b47-9940-0d83635ad54e",
+      "name": "On form submission",
+      "webhookId": "5d8b3161-98bb-4889-a203-e81a613aad32"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Do Deep research about the given topic ",
+        "query": "={{ $json.output }} ",
+        "options": {
+          "include_raw_content": true,
+          "include_images": true,
+          "include_image_descriptions": true,
+          "include_domains": [],
+          "include_favicon": true
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        624
+      ],
+      "id": "786c519c-cb9f-440f-b3ce-4dc565ee0deb",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "0xtTUS7rYfyzScZ0",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic of the Youtube video: {{ $json.Topic }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Use the Tavily Search Tool to gather the latest and most relevant information about the given topic. Analyze the top articles, headlines, and content snippets to understand what is currently engaging audiences.\n\nThen, based on your analysis and drawing inspiration from the high-converting YouTube title examples below, generate **5 highly clickable YouTube video thumbnail titles** for the topic. These titles should be optimized for curiosity, clarity, and virality.\n\nYour ONLY output should be **5 strong YouTube thumbnail titles** — no extra explanation, just the titles in a bullet list.\n\n---\n\n50 High-Click YouTube Title Examples\n1. BREAKING: [Your Big News Headline Here]!\n2. Why Everyone’s Talking About This New AI Tool\n3. This Free Agent Tool Will Blow Your Mind\n4. I Built My $15K Side Hustle in Just 8 Days\n5. How I Went from $0 to $10 Million (Step■by■Step)\n6. The Tool That Grew My Channel Overnight\n7. (I Might Delete This)… But Here’s How I Make $$$\n8. This Startup Idea Made Me Rich—Fast\n9. What OpenAI Just Released Changed Everything\n10. Watch This: Your Shortcut to Viral Videos\n11. AI Tools That Will Replace Your 9■5 Job\n12. I Let AI Run My Business for 30 Days (Here’s What Happened)\n13. How to Make Passive Income Using AI in 2025\n14. You Won’t Believe What This FREE Tool Can Do\n15. This Side Hustle Needs NO Experience!\n16. 10 Websites That Feel Illegal to Know\n17. He Made $20K Using Just ChatGPT\n18. The Easiest Way to Start a SaaS in 2025\n19. The AI Agent That Works While You Sleep\n20. I Copied This Strategy and Made $$$\n21. The Future of Work: AI Just Changed Everything\n22. How I Built a Business Without Writing Code\n23. This Tiny Tool Made Me Go Viral\n24. I Asked ChatGPT to Build My Startup Idea\n25. This One Prompt Changed My Life\n26. Watch This Before You Start Your Side Hustle\n27. How I Grew from 0 to 100K in 30 Days\n28. The AI Hack You’re Not Using Yet\n29. Why This New App Will Kill Google\n30. My $0 to $100K Freelance Journey (Full Breakdown)\n31. Make Money While You Sleep (Literally)\n32. I Found the Ultimate Free AI Toolkit\n33. The Untold Secret of Growing Fast on YouTube\n34. One Video Made Me $12,453—Here’s How\n35. The Creator Economy is Exploding—Jump In Now\n36. This AI Side Hustle is So Easy It Feels Fake\n37. No One is Talking About This AI Hack (But They Will)\n38. This Free Site Just Replaced My Designer\n39. What Everyone Gets Wrong About AI Tools\n40. This Tool is the Canva for Developers\n41. How to Turn Your Ideas into $$$ Using AI\n42. This AI Assistant Will Run Your Entire Life\n43. The Hustle Stack You Need in 2025\n44. Can AI Really Replace You? I Tested It\n45. The Fastest Way to Launch a SaaS (No Code Needed)\n46. I Used Only Free Tools to Make $10K\n47. What I’d Do If I Were Starting from $0 Today\n48. The Secret to Finding Viral Video Ideas\n49. How to Grow Without Paying for Ads\n50. This Tool is the Secret Behind Top Creators\n51. The Only AI Tool You’ll Ever Need in 2025.\n\n---\n\n**OUTPUT FORMAT**\nTitle1: title1\nTitle2: title2\nTitle3: title3\nTitle4: title4\nTitle5: title5\n\nNow create 5 YouTube titles for the given topic below using Tavily Search to research it first:\n**Topic:** {{ $json.Topic }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        400
+      ],
+      "id": "5b336a3e-61ab-45bd-8975-231b7bc0a0d7",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        608
+      ],
+      "id": "43a0481d-7cd8-4831-bb45-768c0bdb395b",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eSh3Pj4GS27tPEOB",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Do Deep research about the given topic ",
+        "query": "={{ $json.Topic }}",
+        "options": {
+          "include_raw_content": true,
+          "include_images": true,
+          "include_image_descriptions": true,
+          "include_domains": [],
+          "include_favicon": true
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        448,
+        608
+      ],
+      "id": "0940d6f6-3066-47ea-aa36-6d3f5ef708bc",
+      "name": "Search in Tavily1",
+      "credentials": {
+        "tavilyApi": {
+          "id": "0xtTUS7rYfyzScZ0",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Title1\": \"title1\",\n\t\"Title2\": \"title2\",\n    \"Title3\": \"title3\",\n    \"Title4\": \"title4\",\n    \"Title5\": \"title5\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        656
+      ],
+      "id": "0a8b8d09-1992-494d-87cb-c19c1bca6f15",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        784,
+        400
+      ],
+      "id": "bb91bf25-c2b3-4d40-a52b-a4eaa26d6e30",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        544,
+        416
+      ],
+      "id": "367d7ac0-d54a-4ec0-9aca-b4d9b5e38652",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "sendTo": "tejaslalwani24@outlook.com",
+        "subject": "Youtube Title and Thumbnail",
+        "emailType": "text",
+        "message": "={{ $('Loop Over Items').item.json.output }}",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1664,
+        416
+      ],
+      "id": "fc54aad5-cd5a-442e-ae57-725233cd0193",
+      "name": "Send a message",
+      "webhookId": "01d0cfb3-6a8d-44f2-9f87-27d1ff175d40",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xp4nGrxLLfkKPBWm",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fb99dcfb7364cdfce9c87e521b35a79151df4823b149ecb1a54e0eb51e7be69"
+  }
+}
