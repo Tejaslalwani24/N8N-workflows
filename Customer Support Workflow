@@ -1,0 +1,394 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "835b85ed-be4a-4df2-b7bb-a8033a3f0214",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xp4nGrxLLfkKPBWm",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Customer Support",
+              "description": "An email that is related to helping out a customer. They may be asking questions about our policies or questions about our products or services"
+            },
+            {
+              "category": "Other",
+              "description": "Any email that is not customer support related"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a62d9732-8388-4735-a660-92516088601c",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        304,
+        224
+      ],
+      "id": "1f283c11-c592-41d4-832d-635fb7115f4f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hfApid9TPAzvn0EY",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        464,
+        240
+      ],
+      "id": "ed45c986-f022-4427-bfab-871b1b706039",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Gmail Trigger').item.json.text }}",
+        "options": {
+          "systemMessage": "=#Overview \nYou are a customer support agent for me. Your job is to respond to incoming emails with relevent innformation using your database tool. \n\n## Instructions\n- Your output should be friendly and use emojis\n- sign off as Mr. Helpful from Tech Haven solutions\n\n## Output \nOutput only the body email"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        592,
+        -96
+      ],
+      "id": "682a0ff8-06a3-4892-a354-6084d0bc0961",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        608,
+        128
+      ],
+      "id": "add67160-b58d-476b-a14f-4fef1cd0ecb3",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hfApid9TPAzvn0EY",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Call this tool to access policy and FAQ information",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "demo",
+          "mode": "list",
+          "cachedResultName": "demo"
+        },
+        "options": {
+          "pineconeNamespace": "FAQ"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        720,
+        64
+      ],
+      "id": "7cc62ad6-eeae-4116-b945-3f60bd3afbba",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "8uBY6EoUBRyx2Ey7",
+          "name": "Demo"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        800,
+        288
+      ],
+      "id": "455d0019-1fdb-4bcb-b7da-f5e69c0cd5c6",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hfApid9TPAzvn0EY",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "emailType": "text",
+        "message": "={{ $('AI Agent').item.json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        -96
+      ],
+      "id": "a1e962a6-45ba-4f61-8908-ffc1240f4c05",
+      "name": "Reply to a message",
+      "webhookId": "e19d90a9-8354-4217-891f-2b41fbea657f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xp4nGrxLLfkKPBWm",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "CATEGORY_PROMOTIONS"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        -96
+      ],
+      "id": "cd5e675d-9034-44f8-90da-f7604763eee7",
+      "name": "Add label to message",
+      "webhookId": "777ca786-f2ce-4517-bee0-a59c2ddca600",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xp4nGrxLLfkKPBWm",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        []
+      ]
+    },
+    "Add label to message": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "id": "197d8039857dae9f",
+        "threadId": "197d8039857dae9f",
+        "labelIds": [
+          "UNREAD",
+          "IMPORTANT",
+          "CATEGORY_PERSONAL",
+          "INBOX"
+        ],
+        "sizeEstimate": 6002,
+        "headers": {
+          "delivered-to": "Delivered-To: tejaslalwanicanada@gmail.com",
+          "received": "Received: from smtpclient.apple ([2600:4040:afc3:4000:945e:1ab3:ec20:7c36])\r\n        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d51040sm21017166d6.63.2025.07.04.17.36.42\r\n        for <tejaslalwanicanada@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);\r\n        Fri, 04 Jul 2025 17:36:42 -0700 (PDT)",
+          "x-received": "X-Received: by 2002:a05:6214:c8a:b0:6ff:16da:af20 with SMTP id 6a1803df08f44-702c8b7ee58mr56593656d6.14.1751675803242;\r\n        Fri, 04 Jul 2025 17:36:43 -0700 (PDT)",
+          "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1751675803; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=VNdqwqoxIdzFl2zpfxQ3YRUdqzkzo7RiukjXSIGdqWG3+vaq978r8i2yhrlmi/3aBW\r\n         48qI4F+azuxmM318+j4SiWDKtcR29w7AkU4rTD3XH7H/JuWbzeoHsUU0Hh9a8tQg1Ahp\r\n         fbd3l6fViVRGTbKTcIglNF+A7Fs74wIzH+SrqfJis7d2cXVPxECXYl7tU3hWXPqtvj9e\r\n         o43dzt+6J0onP5oshFVxSNvJEbRYzlYdYplk/r5/zB0idqplVYWTMRXywmfaA75MoRD3\r\n         ads/qCfndPiJpbLSvk2IkAARHUmHs8/Lt9E2WohLtvVcLgwzmh1c7w6yjRlKs8szzVah\r\n         FW6w==",
+          "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:message-id:subject:date:mime-version:content-transfer-encoding\r\n         :from:dkim-signature;\r\n        bh=i/X87fXwU8i4NPUjvexnfHNICqviWcPKyJ90TkQlQMk=;\r\n        fh=vFs1yTyqHvEm1rnVlPehdXIJnx89Xsdw7V9O14+oKVg=;\r\n        b=jwl0ONpNPDN11fLt6AmaSV0wqdlIC3AyQPHyzSA1UbX5sQJP80XkIslxmojgY396St\r\n         Y85xFXg4PLlI6rMgHu0kDdDy4PS7LCp24tYxL+43JufGSdSwIbTRBgjoL2hoSdxDPAyA\r\n         68oJ41AvY9bYRJEa1nYzEGGHbrZp/T49zlRzVZh6iN3pV0DqfNPbubFseo4ycV2LrUCA\r\n         j7fDObcUl3BKhozxPfsg8XlBfMopvdxJL4NTOoIZp1eapQ+uc5LpPIWElt0DcpZtnWRm\r\n         LKytzSag3bZp2u9tbUU7/h3cG0LGWBWLZzWy5G4dPyYd3MKzwI1Qx/VG0ZTacZ/OPhHV\r\n         ZEPQ==;\r\n        dara=google.com",
+          "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=cB37Gco7;\r\n       spf=pass (google.com: domain of tejaslalwani24@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=tejaslalwani24@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+          "return-path": "Return-Path: <tejaslalwani24@gmail.com>",
+          "received-spf": "Received-SPF: pass (google.com: domain of tejaslalwani24@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;",
+          "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=cB37Gco7;\r\n       spf=pass (google.com: domain of tejaslalwani24@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=tejaslalwani24@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+          "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=gmail.com; s=20230601; t=1751675803; x=1752280603; dara=google.com;\r\n        h=to:message-id:subject:date:mime-version:content-transfer-encoding\r\n         :from:from:to:cc:subject:date:message-id:reply-to;\r\n        bh=i/X87fXwU8i4NPUjvexnfHNICqviWcPKyJ90TkQlQMk=;\r\n        b=cB37Gco7EmKc0lokWR1e+PCBHrxgc8p60vVRH9t2UXKW4kEsYveav45yojRkx865mH\r\n         LDsr8+3Og3pu9NAqGDj/86oBPEr3UBOhaKCLtC4K4l5CL50txZHaDGw5TeI1V439iQrA\r\n         F0cnKiq7+8YjWP8VSzdllv3Sw4lcyXZMoHyiz6m35I9uqoxRoBEepVXVCDzJVztpH12A\r\n         MHu/Szn/ue4Yc4cxXu8Yt/vsJv87cMfprMSRrnGsqqwBcQ0FMjodxXD+lKT4vG5lEibI\r\n         NjN7J5cmndW1Ew+J9BLYz4OjfSQRiytXmiVWSW4bD0ys9SU/sIdNNe4y2yj1xA5iRKQf\r\n         Odaw==",
+          "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20230601; t=1751675803; x=1752280603;\r\n        h=to:message-id:subject:date:mime-version:content-transfer-encoding\r\n         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;\r\n        bh=i/X87fXwU8i4NPUjvexnfHNICqviWcPKyJ90TkQlQMk=;\r\n        b=cNa557ybYh+mEHg1+hnWqQzPegTh28axC7hFMP+Jyz6UWnMXP/er9eUiYBm/iqJqbq\r\n         GrFNxPvkuK/jaK/SfquoveoKg23VB906N3f/vkxwcJuoS4AAa2TavG/D6F8u0S+ZqX5E\r\n         CtpEdtdah8aDRSzHCeZUD3Xjl67omXJHQWJ+6f4MgUhv+k/hNhBIaXT54j/O7skUZWfz\r\n         e/4UEuXTREqID8orQMAgyDqin0P+1F8xxvj3RkpY8VnboreyNSLRN5xa+UaUnbTxCpF1\r\n         nomMPBvsSPIyV3Ri7RTUAWFejI3oIg7iUS6fSZyTMcJ9MDWaedSHKKECsnG+mH+K0l1n\r\n         ve6g==",
+          "x-gm-message-state": "X-Gm-Message-State: AOJu0YzaaZuOCh9Dm02Ea4je+vQeC1dalZJQjbTx9v4b0C8TtSVcEbO2\r\n\t/D/fYVuz7l7S8rGrnES4bY0VcYSNMvmEz296551puPZLZ5OYnNcvzZ/hHPpDpwGU",
+          "x-gm-gg": "X-Gm-Gg: ASbGncv00ytaSSKidcdqwZ9V+7zoEgkd+EYYqM6yhkHgZB5frT63BLjCxAJWzLhJN/R\r\n\t5siU2PdIuTaHmqdDo0l0BcclAijALxVs3cJtQAE/cVQXe3ZkW7odEBJSFKJDumc6FLgrxg7ulxh\r\n\tUefqPLLRjf+qY30uQw8di2ZW8noTv/xMXefld4/06tyQEkJMb+yWnedCJI7wl3IOQLwcuEKtWWy\r\n\tYloVLQzGAxeqxhr6ijq20tYGJ3MDYyVMU5wxvAeH6L2coAmK0EnvmcsobE9PMjtg/dhlvSuXq7+\r\n\tozERy5K7NQtZoz+b9J8ktQTGWhKQqXsz1C/wZWHoqz9CH+VSozMJKx2a5o0l4kfOYuSSzXI73ol\r\n\t+Dc48cSlquINW7tGBrjrE",
+          "x-google-smtp-source": "X-Google-Smtp-Source: AGHT+IGEyjZYeMgy0Y2nEemrIF1EFBBT8fEeuWxehiArbpfieZYw3Q4ezY9QIV0FPLjgbaYY3u18eA==",
+          "from": "From: Tejas Lalwani <tejaslalwani24@gmail.com>",
+          "x-google-original-from": "X-Google-Original-From: Tejas Lalwani <Tejaslalwani24@gmail.com>",
+          "content-type": "Content-Type: text/plain; charset=us-ascii",
+          "content-transfer-encoding": "Content-Transfer-Encoding: 7bit",
+          "mime-version": "Mime-Version: 1.0 (1.0)",
+          "date": "Date: Fri, 4 Jul 2025 20:36:32 -0400",
+          "subject": "Subject: Hi",
+          "message-id": "Message-Id: <B39E7FF9-4316-41F9-9B65-18577ACC9191@gmail.com>",
+          "to": "To: tejaslalwanicanada@gmail.com",
+          "x-mailer": "X-Mailer: iPhone Mail (22B83)"
+        },
+        "text": "Tell me about your refund ad return policy \n",
+        "textAsHtml": "<p>Tell me about your refund ad return policy</p>",
+        "subject": "Hi",
+        "date": "2025-07-05T00:36:32.000Z",
+        "to": {
+          "value": [
+            {
+              "address": "tejaslalwanicanada@gmail.com",
+              "name": ""
+            }
+          ],
+          "html": "<span class=\"mp_address_group\"><a href=\"mailto:tejaslalwanicanada@gmail.com\" class=\"mp_address_email\">tejaslalwanicanada@gmail.com</a></span>",
+          "text": "tejaslalwanicanada@gmail.com"
+        },
+        "from": {
+          "value": [
+            {
+              "address": "tejaslalwani24@gmail.com",
+              "name": "Tejas Lalwani"
+            }
+          ],
+          "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Tejas Lalwani</span> &lt;<a href=\"mailto:tejaslalwani24@gmail.com\" class=\"mp_address_email\">tejaslalwani24@gmail.com</a>&gt;</span>",
+          "text": "\"Tejas Lalwani\" <tejaslalwani24@gmail.com>"
+        },
+        "messageId": "<B39E7FF9-4316-41F9-9B65-18577ACC9191@gmail.com>",
+        "html": false
+      }
+    ]
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fb99dcfb7364cdfce9c87e521b35a79151df4823b149ecb1a54e0eb51e7be69"
+  }
+}
