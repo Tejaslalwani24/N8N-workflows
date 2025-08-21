@@ -1,0 +1,123 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        224
+      ],
+      "id": "66f72dcd-a2e3-450c-921d-d1e27fe8c843",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eSh3Pj4GS27tPEOB",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Use the send message in gmail tool to send emails. \nIt is mandatory for you to use this tool everytime"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "3d15aecb-3303-46e4-9617-04c763ddb5a3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatInput",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "192c5176-93fa-4b22-9e74-0c90923eae8b",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "tejaslalwani24@outlook.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        208
+      ],
+      "id": "2c0dfbc2-21b8-46bc-b2fe-7e6c3209ec32",
+      "name": "Send a message in Gmail",
+      "webhookId": "09bcf860-6de8-4c1a-ae72-3d8baec06835",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xp4nGrxLLfkKPBWm",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fb99dcfb7364cdfce9c87e521b35a79151df4823b149ecb1a54e0eb51e7be69"
+  }
+}
